@@ -4,9 +4,6 @@
 .vscode/
 *.code-workspace
 
-# Local language-server configuration
-.clangd
-
 # Local generated build metadata
 .build/
 compile_commands.json
