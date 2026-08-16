@@ -4,12 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "InputAction.h"
 #include "RoggCharacter.generated.h"
 
 class UInputAction;
 class UCameraComponent;
 class USpringArmComponent;
 struct FInputActionValue;
+struct FInputActionInstance;
 
 UCLASS()
 class UNREALROGGLYKE_API ARoggCharacter : public ACharacter
@@ -37,6 +39,8 @@ protected:
 	virtual void BeginPlay() override;
 
 	void Move(const FInputActionValue& InValue);
+
+	void Look(const FInputActionInstance& InValue);
 
 public:
 	// Called every frame

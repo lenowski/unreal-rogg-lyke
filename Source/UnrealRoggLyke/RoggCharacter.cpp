@@ -6,6 +6,7 @@
 #include "HAL/Platform.h"
 #include "Camera/CameraComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "InputAction.h"
 
 // Sets default values
 ARoggCharacter::ARoggCharacter()
@@ -15,6 +16,7 @@ ARoggCharacter::ARoggCharacter()
 
 	SpringArmComponent = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArmComponent"));
 	SpringArmComponent->SetupAttachment(RootComponent);
+	SpringArmComponent->bUsePawnControlRotation = true;
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
@@ -36,9 +38,23 @@ void ARoggCharacter::Move(const FInputActionValue& InValue)
 {
 	FVector2D InputValue = InValue.Get<FVector2D>();
 
-	FVector	  MoveDirection = FVector(InputValue.X, InputValue.Y, 0.0f);
+	FRotator ControlRotation = GetControlRotation();
+	ControlRotation.Pitch = 0.0f;
 
-	AddMovementInput(MoveDirection);
+	// Forward/backward
+	AddMovementInput(ControlRotation.Vector(), InputValue.X);
+
+	// Right/left
+	FVector RigthDirection = ControlRotation.RotateVector(FVector::RightVector);
+	AddMovementInput(RigthDirection, InputValue.Y);
+}
+
+void ARoggCharacter::Look(const FInputActionInstance& InValue)
+{
+	FVector2D InputValue = InValue.GetValue().Get<FVector2D>();
+
+	AddControllerYawInput(InputValue.X);
+	AddControllerPitchInput(InputValue.Y);
 }
 
 // Called to bind functionality to input
@@ -49,4 +65,6 @@ void ARoggCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 	UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent);
 
 	EnhancedInput->BindAction(Input_Move, ETriggerEvent::Triggered, this, &ARoggCharacter::Move);
+
+	EnhancedInput->BindAction(Input_Look, ETriggerEvent::Triggered, this, &ARoggCharacter::Look);
 }
