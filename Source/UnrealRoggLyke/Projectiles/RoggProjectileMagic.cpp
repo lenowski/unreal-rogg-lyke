@@ -3,8 +3,11 @@
 #include "RoggProjectileMagic.h"
 
 #include "Components/SphereComponent.h"
+#include "GameFramework/DamageType.h"
 #include "GameFramework/ProjectileMovementComponent.h"
+#include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
 
 ARoggProjectileMagic::ARoggProjectileMagic()
 {
@@ -19,4 +22,23 @@ ARoggProjectileMagic::ARoggProjectileMagic()
 	ProjectileMovementComponent = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovementComponent"));
 	ProjectileMovementComponent->InitialSpeed = 2000.f;
 	ProjectileMovementComponent->ProjectileGravityScale = 0.f;
+}
+
+void ARoggProjectileMagic::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	SphereComponent->OnComponentHit.AddDynamic(this, &ARoggProjectileMagic::OnActorHit);
+}
+
+void ARoggProjectileMagic::OnActorHit(
+	UPrimitiveComponent* HitComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+{
+	// TODO: Create a damage type for magic projectiles
+	TSubclassOf<UDamageType> DamageTypeClass = UDamageType::StaticClass();
+	UGameplayStatics::ApplyDamage(OtherActor, 10.f, GetInstigatorController(), this, DamageTypeClass);
+
+	UNiagaraFunctionLibrary::SpawnSystemAtLocation(this, ExplosionEffect, GetActorLocation());
+
+	Destroy();
 }
