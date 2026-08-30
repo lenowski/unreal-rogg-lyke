@@ -2,11 +2,12 @@
 
 #include "RoggCharacter.h"
 
-#include "EnhancedInputComponent.h"
-#include "HAL/Platform.h"
 #include "Camera/CameraComponent.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Engine/World.h"
+#include "EnhancedInputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
-#include "InputAction.h"
+#include "Projectiles/RoggProjectileMagic.h"
 
 // Sets default values
 ARoggCharacter::ARoggCharacter()
@@ -20,6 +21,8 @@ ARoggCharacter::ARoggCharacter()
 
 	CameraComponent = CreateDefaultSubobject<UCameraComponent>(TEXT("CameraComponent"));
 	CameraComponent->SetupAttachment(SpringArmComponent);
+
+	MuzzleSocketName = "Muzzle_01";
 }
 
 // Called when the game starts or when spawned
@@ -28,10 +31,17 @@ void ARoggCharacter::BeginPlay()
 	Super::BeginPlay();
 }
 
-// Called every frame
-void ARoggCharacter::Tick(float DeltaTime)
+// Called to bind functionality to input
+void ARoggCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 {
-	Super::Tick(DeltaTime);
+	Super::SetupPlayerInputComponent(PlayerInputComponent);
+
+	UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+
+	EnhancedInput->BindAction(Input_Move, ETriggerEvent::Triggered, this, &ARoggCharacter::Move);
+	EnhancedInput->BindAction(Input_Look, ETriggerEvent::Triggered, this, &ARoggCharacter::Look);
+
+	EnhancedInput->BindAction(Input_PrimaryAttack, ETriggerEvent::Triggered, this, &ARoggCharacter::PrimaryAttack);
 }
 
 void ARoggCharacter::Move(const FInputActionValue& InValue)
@@ -57,14 +67,19 @@ void ARoggCharacter::Look(const FInputActionInstance& InValue)
 	AddControllerPitchInput(InputValue.Y);
 }
 
-// Called to bind functionality to input
-void ARoggCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
+void ARoggCharacter::PrimaryAttack()
 {
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
+	FVector SpawnLocation = GetMesh()->GetSocketLocation(MuzzleSocketName);
+	FRotator SpawnRotation = GetControlRotation();
+	FActorSpawnParameters SpawnParameters;
+	SpawnParameters.Instigator = this;
+	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParameters);
+}
 
-	EnhancedInput->BindAction(Input_Move, ETriggerEvent::Triggered, this, &ARoggCharacter::Move);
-
-	EnhancedInput->BindAction(Input_Look, ETriggerEvent::Triggered, this, &ARoggCharacter::Look);
+// Called every frame
+void ARoggCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
 }

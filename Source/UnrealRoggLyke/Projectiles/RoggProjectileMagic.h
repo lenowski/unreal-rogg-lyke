@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
 #include "RoggProjectileMagic.generated.h"
 
 class USphereComponent;
@@ -11,7 +12,7 @@ class UProjectileMovementComponent;
 class UNiagaraComponent;
 class UNiagaraSystem;
 
-UCLASS()
+UCLASS(Abstract)
 class UNREALROGGLYKE_API ARoggProjectileMagic : public AActor
 {
 	GENERATED_BODY()

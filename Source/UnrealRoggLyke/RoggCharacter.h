@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
-#include "InputAction.h"
 #include "RoggCharacter.generated.h"
 
+class ARoggProjectileMagic;
 class UInputAction;
 class UCameraComponent;
 class USpringArmComponent;
+
 struct FInputActionValue;
 struct FInputActionInstance;
 
@@ -23,11 +24,20 @@ public:
 	ARoggCharacter();
 
 protected:
+	UPROPERTY(EditDefaultsOnly, Category = "PrimaryAttack")
+	TSubclassOf<ARoggProjectileMagic> ProjectileClass;
+
+	UPROPERTY(VisibleAnywhere, Category = "PrimaryAttack")
+	FName MuzzleSocketName;
+
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_Move;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
 	TObjectPtr<UInputAction> Input_Look;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	TObjectPtr<UInputAction> Input_PrimaryAttack;
 
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	TObjectPtr<UCameraComponent> CameraComponent;
@@ -42,11 +52,12 @@ protected:
 
 	void Look(const FInputActionInstance& InValue);
 
+	void PrimaryAttack();
+
 public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
 	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(
-		class UInputComponent* PlayerInputComponent) override;
+	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 };

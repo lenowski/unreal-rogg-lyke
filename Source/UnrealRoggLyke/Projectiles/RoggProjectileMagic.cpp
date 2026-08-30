@@ -4,6 +4,7 @@
 
 #include "Components/SphereComponent.h"
 #include "GameFramework/DamageType.h"
+#include "GameFramework/Pawn.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "NiagaraComponent.h"
@@ -29,6 +30,7 @@ void ARoggProjectileMagic::PostInitializeComponents()
 	Super::PostInitializeComponents();
 
 	SphereComponent->OnComponentHit.AddDynamic(this, &ARoggProjectileMagic::OnActorHit);
+	SphereComponent->IgnoreActorWhenMoving(GetInstigator(), true);
 }
 
 void ARoggProjectileMagic::OnActorHit(
