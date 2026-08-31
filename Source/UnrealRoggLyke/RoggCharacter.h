@@ -10,6 +10,7 @@ class ARoggProjectileMagic;
 class UInputAction;
 class UCameraComponent;
 class USpringArmComponent;
+class UAnimMontage;
 
 struct FInputActionValue;
 struct FInputActionInstance;
@@ -30,7 +31,10 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "PrimaryAttack")
 	FName MuzzleSocketName;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Input")
+	UPROPERTY(EditDefaultsOnly, Category = "PrimaryAttack")
+	TObjectPtr<UAnimMontage> AttackMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PrimaryAttack")
 	TObjectPtr<UInputAction> Input_Move;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input")
@@ -53,6 +57,8 @@ protected:
 	void Look(const FInputActionInstance& InValue);
 
 	void PrimaryAttack();
+
+	void AttackTimerElapsed();
 
 public:
 	// Called every frame

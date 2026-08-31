@@ -8,6 +8,7 @@
 #include "EnhancedInputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Projectiles/RoggProjectileMagic.h"
+#include "TimerManager.h"
 
 // Sets default values
 ARoggCharacter::ARoggCharacter()
@@ -68,6 +69,16 @@ void ARoggCharacter::Look(const FInputActionInstance& InValue)
 }
 
 void ARoggCharacter::PrimaryAttack()
+{
+	PlayAnimMontage(AttackMontage);
+
+	const float AttackDelayTime = 0.2f;
+
+	FTimerHandle AttackTimerHandle;
+	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ARoggCharacter::AttackTimerElapsed, AttackDelayTime);
+}
+
+void ARoggCharacter::AttackTimerElapsed()
 {
 	FVector SpawnLocation = GetMesh()->GetSocketLocation(MuzzleSocketName);
 	FRotator SpawnRotation = GetControlRotation();
