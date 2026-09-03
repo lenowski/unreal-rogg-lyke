@@ -7,6 +7,8 @@
 #include "Engine/World.h"
 #include "EnhancedInputComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Kismet/GameplayStatics.h"
+#include "NiagaraFunctionLibrary.h"
 #include "Projectiles/RoggProjectileMagic.h"
 #include "TimerManager.h"
 
@@ -74,6 +76,11 @@ void ARoggCharacter::PrimaryAttack()
 
 	const float AttackDelayTime = 0.2f;
 
+	UNiagaraFunctionLibrary::SpawnSystemAttached(
+		CastingEffect, GetMesh(), MuzzleSocketName, FVector::ZeroVector, FRotator::ZeroRotator, EAttachLocation::Type::SnapToTarget, true);
+
+	UGameplayStatics::PlaySound2D(this, CastingSound);
+
 	FTimerHandle AttackTimerHandle;
 	GetWorldTimerManager().SetTimer(AttackTimerHandle, this, &ARoggCharacter::AttackTimerElapsed, AttackDelayTime);
 }
@@ -86,7 +93,9 @@ void ARoggCharacter::AttackTimerElapsed()
 	SpawnParameters.Instigator = this;
 	SpawnParameters.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParameters);
+	AActor* NewProjectile = GetWorld()->SpawnActor<AActor>(ProjectileClass, SpawnLocation, SpawnRotation, SpawnParameters);
+
+	MoveIgnoreActorAdd(NewProjectile);
 }
 
 // Called every frame

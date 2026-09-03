@@ -11,6 +11,7 @@ class UInputAction;
 class UCameraComponent;
 class USpringArmComponent;
 class UAnimMontage;
+class UNiagaraSystem;
 
 struct FInputActionValue;
 struct FInputActionInstance;
@@ -27,6 +28,12 @@ public:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "PrimaryAttack")
 	TSubclassOf<ARoggProjectileMagic> ProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PrimaryAttack")
+	TObjectPtr<UNiagaraSystem> CastingEffect;
+
+	UPROPERTY(EditDefaultsOnly, Category = "PrimaryAttack")
+	TObjectPtr<USoundBase> CastingSound;
 
 	UPROPERTY(VisibleAnywhere, Category = "PrimaryAttack")
 	FName MuzzleSocketName;
